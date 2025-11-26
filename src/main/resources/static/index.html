@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Lanchonete</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 20px auto; padding: 0 20px; }
+        .card { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px; background-color: #f9f9f9; }
+        input { display: block; margin: 10px 0; padding: 8px; width: 100%; max-width: 300px; }
+        button { padding: 10px 20px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #218838; }
+
+        /* Estilo novo para a lista ficar bonita com a descrição */
+        .item-lista { border-bottom: 1px solid #eee; padding: 10px 0; }
+        .cabecalho-item { display: flex; justify-content: space-between; font-weight: bold; }
+        .descricao-item { font-size: 0.9em; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<h1>🍔 Gerenciador de Cardápio</h1>
+
+<div class="card">
+    <h3>Novo Produto</h3>
+    <input type="text" id="nome" placeholder="Nome do Lanche (Ex: X-Bacon)">
+    <input type="number" id="preco" placeholder="Preço (Ex: 25.50)">
+
+    <input type="text" id="descricao" placeholder="Descrição (Ex: Pão brioche, 2 carnes...)">
+
+    <button onclick="cadastrarProduto()">Cadastrar</button>
+</div>
+
+<h3>Cardápio Atual:</h3>
+<div id="lista-produtos"></div>
+
+<script>
+    async function carregarProdutos() {
+        const resposta = await fetch('http://localhost:8080/produtos');
+        const produtos = await resposta.json();
+
+        const divLista = document.getElementById('lista-produtos');
+        divLista.innerHTML = '';
+
+        produtos.forEach(produto => {
+            const item = document.createElement('div');
+            item.className = 'item-lista';
+
+            // 3. MOSTRAR A DESCRIÇÃO NA TELA
+            // Usei uma verificação (|| '') para não mostrar "undefined" se estiver vazio
+            item.innerHTML = `
+                <div class="cabecalho-item">
+                    <span>${produto.nome}</span>
+                    <span>R$ ${produto.preco}</span>
+                </div>
+                <div class="descricao-item">
+                    ${produto.descricao || 'Sem descrição'}
+                </div>
+            `;
+            divLista.appendChild(item);
+        });
+    }
+
+    async function cadastrarProduto() {
+        const nomeInput = document.getElementById('nome').value;
+        const precoInput = document.getElementById('preco').value;
+        // 2. PEGAR O VALOR NOVO
+        const descricaoInput = document.getElementById('descricao').value;
+
+        if (!nomeInput || !precoInput) return alert("Preencha nome e preço!");
+
+        const dadosProduto = {
+            nome: nomeInput,
+            preco: parseFloat(precoInput),
+            // ADICIONAR NO JSON (O nome 'descricao' tem que ser igual ao do Java)
+            descricao: descricaoInput
+        };
+
+        await fetch('http://localhost:8080/produtos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dadosProduto)
+        });
+
+        document.getElementById('nome').value = '';
+        document.getElementById('preco').value = '';
+        // LIMPAR O CAMPO NOVO
+        document.getElementById('descricao').value = '';
+
+        carregarProdutos();
+        alert("Produto cadastrado com sucesso!");
+    }
+
+    carregarProdutos();
+</script>
+</body>
+</html>
