@@ -3,182 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <title>Controle de Mesas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        body { font-family: sans-serif; background-color: #e9ecef; padding: 20px; }
-        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        :root { --primary: #FF6B6B; --green: #2ecc71; --dark: #2D3436; --light: #F7F9FC; }
 
-        /* PAINEL DE ABRIR MESA */
-        .painel-novo {
-            background: white; padding: 20px; border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto 40px auto;
-            display: flex; gap: 10px; align-items: center;
-        }
-        input { padding: 12px; border: 1px solid #ddd; border-radius: 6px; flex: 1; }
-        button { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--light); margin: 0; color: var(--dark); }
 
-        .btn-abrir { background: #28a745; color: white; }
-        .btn-abrir:hover { background: #218838; }
+        /* MENU IGUAL AO OUTRO */
+        nav { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 600; font-size: 1.5em; color: var(--primary); }
+        .menu-links a { text-decoration: none; color: #666; margin-left: 20px; font-weight: 500; transition: 0.3s; }
+        .menu-links a:hover, .menu-links a.active { color: var(--primary); }
 
-        .btn-add { background: #007bff; color: white; padding: 8px 15px; }
-        .btn-add:hover { background: #0056b3; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
 
-        .btn-fechar {
-            width: 100%; margin-top: 10px; background-color: #dc3545;
-            color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;
-        }
-        .btn-fechar:hover { background-color: #c82333; }
+        /* PAINEL NOVO */
+        .painel-novo { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; gap: 10px; align-items: center; max-width: 700px; margin: 0 auto 40px auto; border: 1px solid #eee; }
+        .painel-novo h3 { margin: 0; white-space: nowrap; margin-right: 15px; color: #555; }
+        input { padding: 12px; border: 2px solid #eee; border-radius: 8px; flex: 1; outline: none; }
+        input:focus { border-color: var(--green); }
 
-        /* GRID DAS MESAS */
-        .grid-mesas { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .btn-abrir { background: var(--green); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-abrir:hover { background: #27ae60; }
 
-        .card-mesa {
-            background: white; width: 280px; border-radius: 12px; overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column;
-        }
+        /* GRID */
+        .grid-mesas { display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; }
 
-        .card-header {
-            background: #28a745; color: white; padding: 15px; text-align: center;
-        }
-        .card-header h2 { margin: 0; font-size: 2em; }
-        .card-header span { font-size: 0.9em; opacity: 0.9; }
+        .card-mesa { background: white; width: 300px; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: 0.3s; border-top: 5px solid var(--green); }
+        .card-mesa:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
 
-        .card-body { padding: 15px; flex: 1; }
-        .lista-itens { min-height: 50px; margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; }
-        .item-pedido { display: flex; justify-content: space-between; font-size: 0.9em; color: #555; margin-bottom: 5px; }
+        .card-header { padding: 20px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+        .numero-mesa { font-size: 2.5em; font-weight: 700; color: var(--dark); line-height: 1; }
+        .nome-cliente { color: #888; font-size: 0.9em; margin-top: 5px; }
 
-        .card-footer { padding: 15px; background: #f8f9fa; border-top: 1px solid #eee; }
-        .total-conta { font-size: 1.2em; font-weight: bold; text-align: right; color: #333; margin-bottom: 10px; }
+        .card-body { padding: 20px; flex: 1; background: #fff; }
+        .lista-itens { min-height: 80px; max-height: 150px; overflow-y: auto; margin-bottom: 15px; }
+        .item-pedido { display: flex; justify-content: space-between; font-size: 0.9em; color: #555; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #eee; }
 
-        .acao-add { display: flex; gap: 5px; }
-        .acao-add input { padding: 8px; font-size: 0.9em; }
+        .total-area { text-align: right; font-size: 1.3em; font-weight: 700; color: var(--green); margin-top: 10px; }
 
+        .card-footer { padding: 15px; background: #fafafa; border-top: 1px solid #eee; }
+        .add-area { display: flex; gap: 5px; margin-bottom: 10px; }
+        .add-area input { padding: 8px; font-size: 0.9em; }
+        .btn-add { background: #3498db; color: white; border: none; width: 40px; border-radius: 6px; cursor: pointer; }
+
+        .btn-fechar { width: 100%; background: #e74c3c; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-fechar:hover { background: #c0392b; }
     </style>
 </head>
 <body>
 
-<h1>🍽️ Controle de Mesas & Pedidos</h1>
+<nav>
+    <div class="logo"><i class="fas fa-hamburger"></i> Lanchonete App</div>
+    <div class="menu-links">
+        <a href="index.html">Produtos</a>
+        <a href="comandas.html" class="active">Mesas & Comandas</a>
+    </div>
+</nav>
 
-<div class="painel-novo">
-    <h3 style="margin: 0 10px 0 0;">Nova Mesa:</h3>
-    <input type="number" id="numMesa" placeholder="Nº Mesa">
-    <input type="text" id="nomeCliente" placeholder="Nome do Cliente">
-    <button class="btn-abrir" onclick="abrirMesa()">ABRIR MESA</button>
+<div class="container">
+    <div class="painel-novo">
+        <h3><i class="fas fa-plus-circle"></i> Nova Mesa</h3>
+        <input type="number" id="numMesa" placeholder="Nº">
+        <input type="text" id="nomeCliente" placeholder="Nome do Cliente">
+        <button class="btn-abrir" onclick="abrirMesa()">Abrir</button>
+    </div>
+
+    <div id="grid" class="grid-mesas"></div>
 </div>
 
-<div id="grid" class="grid-mesas"></div>
-
 <script>
-    
+    // O CÓDIGO JS É O MESMO, SÓ MUDAMOS O HTML ACIMA
     async function carregarMesas() {
         try {
             const resposta = await fetch('http://localhost:8080/comandas');
             const mesas = await resposta.json();
-
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
 
             mesas.forEach(mesa => {
-                // SE A MESA ESTIVER FECHADA, NÃO MOSTRA (Pula para a próxima)
                 if (mesa.estaAberta === false) return;
 
-                // Calcular total da mesa somando os produtos
                 let total = 0;
                 let htmlItens = '';
 
                 if(mesa.itens) {
                     mesa.itens.forEach(item => {
-                        // Proteção caso o produto tenha sido deletado
                         if(item.produto) {
                             total += item.produto.preco * item.quantidade;
                             htmlItens += `
                                 <div class="item-pedido">
-                                    <span>${item.quantidade}x ${item.produto.nome}</span>
+                                    <span><b>${item.quantidade}x</b> ${item.produto.nome}</span>
                                     <span>R$ ${item.produto.preco.toFixed(2)}</span>
-                                </div>
-                            `;
+                                </div>`;
                         }
                     });
                 }
 
-                // Criar o cartão HTML
                 const card = document.createElement('div');
                 card.className = 'card-mesa';
                 card.innerHTML = `
                     <div class="card-header">
-                        <h2>${mesa.numeroMesa}</h2>
-                        <span>${mesa.nomeCliente}</span>
+                        <div class="numero-mesa">${mesa.numeroMesa}</div>
+                        <div class="nome-cliente"><i class="fas fa-user"></i> ${mesa.nomeCliente}</div>
                     </div>
                     <div class="card-body">
-                        <div class="lista-itens">
-                            ${htmlItens || '<small style="color:gray">Nenhum pedido ainda...</small>'}
-                        </div>
-                        <div class="total-conta">Total: R$ ${total.toFixed(2)}</div>
+                        <div class="lista-itens">${htmlItens || '<small>Sem pedidos</small>'}</div>
+                        <div class="total-area">R$ ${total.toFixed(2)}</div>
                     </div>
                     <div class="card-footer">
-                        <div class="acao-add">
-                            <input type="number" id="prod-mesa-${mesa.id}" placeholder="ID do Produto" style="width: 60px;">
-                            <button class="btn-add" onclick="adicionarPedido(${mesa.id})">+</button>
+                        <div class="add-area">
+                            <input type="number" id="prod-mesa-${mesa.id}" placeholder="ID Prod.">
+                            <button class="btn-add" onclick="adicionarPedido(${mesa.id})"><i class="fas fa-plus"></i></button>
                         </div>
                         <button class="btn-fechar" onclick="finalizarMesa(${mesa.id})">
-                            💰 Fechar Conta
+                            <i class="fas fa-check-double"></i> Fechar Conta
                         </button>
                     </div>
                 `;
                 grid.appendChild(card);
             });
-        } catch (error) {
-            console.error("Erro ao carregar mesas:", error);
-            alert("Erro ao conectar com o servidor. Veja o console (F12).");
-        }
+        } catch (e) { console.error(e); }
     }
 
-    // --- ABRIR NOVA MESA ---
     async function abrirMesa() {
         const numero = document.getElementById('numMesa').value;
         const cliente = document.getElementById('nomeCliente').value;
-
-        if (!numero || !cliente) return alert("Preencha mesa e cliente!");
+        if (!numero || !cliente) return alert("Preencha tudo!");
 
         await fetch('http://localhost:8080/comandas/abrir', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ numeroMesa: parseInt(numero), nomeCliente: cliente })
         });
-
         document.getElementById('numMesa').value = '';
         document.getElementById('nomeCliente').value = '';
         carregarMesas();
     }
 
-    // --- ADICIONAR ITEM NA MESA ---
     async function adicionarPedido(idComanda) {
         const idProduto = document.getElementById(`prod-mesa-${idComanda}`).value;
+        if(!idProduto) return alert("Digite o ID");
 
-        if(!idProduto) return alert("Digite o ID do produto (Ex: 1, 2...)");
-
-        const resposta = await fetch(`http://localhost:8080/comandas/${idComanda}/adicionar/${idProduto}`, {
-            method: 'POST'
-        });
-
-        if(resposta.ok) {
-            carregarMesas();
-        } else {
-            alert("Erro! Verifique se o ID do produto existe.");
-        }
+        const res = await fetch(`http://localhost:8080/comandas/${idComanda}/adicionar/${idProduto}`, { method: 'POST' });
+        if(res.ok) carregarMesas();
+        else alert("Erro: Produto não achado");
     }
 
-    // --- FINALIZAR (FECHAR) MESA ---
-    async function finalizarMesa(idComanda) {
-        if(!confirm("Tem certeza que deseja fechar a conta?")) return;
-
-        await fetch(`http://localhost:8080/comandas/${idComanda}/fechar`, {
-            method: 'POST'
-        });
-
+    async function finalizarMesa(id) {
+        if(!confirm("Fechar a conta?")) return;
+        await fetch(`http://localhost:8080/comandas/${id}/fechar`, { method: 'POST' });
         carregarMesas();
     }
 
-    // Inicia carregando
     carregarMesas();
 </script>
 </body>
